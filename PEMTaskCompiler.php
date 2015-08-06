@@ -630,7 +630,6 @@ class PEMTaskCompiler
       file_put_contents($dstDir.'/grader.js', $jsGrader);
       file_put_contents($dstDir.'/.htaccess', $htAccessContent);
       file_put_contents($dstDir.'/index.html', $strQuestion);
-      copy(__DIR__.'/task-index.php', $dstDir.'/index.php');
       return true;
    }
 }
