@@ -1,0 +1,8 @@
+{
+    "name": "France-ioi/pem-task-compiler",
+    "autoload": {
+        "psr-0" : {
+            "PEMTaskCompiler" : ""
+        }
+    }
+}
