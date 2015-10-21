@@ -246,51 +246,51 @@ class PEMTaskCompiler
    public function getResourcesByMode($mode)
    {
       $resources = array();
-      if ($mode & Task::TASK) {
-         if (isset($this->bebras->task_modules) && ($mode & Task::INCLUDE_MODULES || $mode & Task::MODULES_ONLY)) {
+      if ($mode & self::TASK) {
+         if (isset($this->bebras->task_modules) && ($mode & self::INCLUDE_MODULES || $mode & self::MODULES_ONLY)) {
             $resources = array_merge($resources, $this->getResourcesWithMeta($this->bebras->task_modules, 'task module'));
          }
-         if (!($mode & Task::MODULES_ONLY)) {
+         if (!($mode & self::MODULES_ONLY)) {
             $resources = array_merge($resources, $this->getResourcesWithMeta($this->bebras->task, 'task'));
          }
       }
-      if ($mode & Task::PROXY) {
-         if (isset($this->bebras->proxy_modules) && ($mode & Task::INCLUDE_MODULES || $mode & Task::MODULES_ONLY)) {
+      if ($mode & self::PROXY) {
+         if (isset($this->bebras->proxy_modules) && ($mode & self::INCLUDE_MODULES || $mode & self::MODULES_ONLY)) {
             $resources = array_merge($resources, $this->getResourcesWithMeta($this->bebras->proxy_modules, 'proxy module'));
          }
-         if (isset($this->bebras->proxy) && !($mode & Task::MODULES_ONLY)) {
+         if (isset($this->bebras->proxy) && !($mode & self::MODULES_ONLY)) {
             $resources = array_merge($resources, $this->getResourcesWithMeta($this->bebras->proxy, 'proxy'));
          }
       }
-      if ($mode & Task::DISPLAY) {
-         if (isset($this->bebras->display_modules) && ($mode & Task::INCLUDE_MODULES || $mode & Task::MODULES_ONLY)) {
+      if ($mode & self::DISPLAY) {
+         if (isset($this->bebras->display_modules) && ($mode & self::INCLUDE_MODULES || $mode & self::MODULES_ONLY)) {
             $resources = array_merge($resources, $this->getResourcesWithMeta($this->bebras->display_modules, 'display module'));
          }
-         if (isset($this->bebras->display) && !($mode & Task::MODULES_ONLY)) {
+         if (isset($this->bebras->display) && !($mode & self::MODULES_ONLY)) {
             $resources = array_merge($resources, $this->getResourcesWithMeta($this->bebras->display, 'display'));
          }
       }
-      if ($mode & Task::SAT) {
-         if (isset($this->bebras->sat_modules) && ($mode & Task::INCLUDE_MODULES || $mode & Task::MODULES_ONLY)) {
+      if ($mode & self::SAT) {
+         if (isset($this->bebras->sat_modules) && ($mode & self::INCLUDE_MODULES || $mode & self::MODULES_ONLY)) {
             $resources = array_merge($resources, $this->getResourcesWithMeta($this->bebras->sat_modules, 'sat module'));
          }
-         if (isset($this->bebras->sat) && !($mode & Task::MODULES_ONLY)) {
+         if (isset($this->bebras->sat) && !($mode & self::MODULES_ONLY)) {
             $resources = array_merge($resources, $this->getResourcesWithMeta($this->bebras->sat, 'sat'));
          }
       }
-      if ($mode & Task::SOLUTION) {
-         if (isset($this->bebras->solution_modules) && ($mode & Task::INCLUDE_MODULES || $mode & Task::MODULES_ONLY)) {
+      if ($mode & self::SOLUTION) {
+         if (isset($this->bebras->solution_modules) && ($mode & self::INCLUDE_MODULES || $mode & self::MODULES_ONLY)) {
             $resources = array_merge($resources, $this->getResourcesWithMeta($this->bebras->solution_modules, 'solution module'));
          }
-         if (!($mode & Task::MODULES_ONLY)) {
+         if (!($mode & self::MODULES_ONLY)) {
             $resources = array_merge($resources, $this->getResourcesWithMeta($this->bebras->solution, 'solution'));
          }
       }
-      if ($mode & Task::GRADER) {
-         if (isset($this->bebras->grader_modules) && ($mode & Task::INCLUDE_MODULES || $mode & Task::MODULES_ONLY)) {
+      if ($mode & self::GRADER) {
+         if (isset($this->bebras->grader_modules) && ($mode & self::INCLUDE_MODULES || $mode & self::MODULES_ONLY)) {
             $resources = array_merge($resources, $this->getResourcesWithMeta($this->bebras->grader_modules, 'grader module'));
          }
-         if (isset($this->bebras->grader) && !($mode & Task::MODULES_ONLY)) {
+         if (isset($this->bebras->grader) && !($mode & self::MODULES_ONLY)) {
             $resources = array_merge($resources, $this->getResourcesWithMeta($this->bebras->grader, 'grader'));
          }
       }
@@ -447,7 +447,7 @@ class PEMTaskCompiler
    /**
     * Copies task content or solution images into $dstDir/$taskKey
     * 
-    * @param int $mode Bitmask with Task::CONTENT and Task::SOLUTION
+    * @param int $mode Bitmask with self::CONTENT and self::SOLUTION
     * @param string $copyFuncName is an optional parameter. If present, it must
     *        be the name of a function with the same signature as the "copy"
     *        function, which will be called instead of it.
@@ -533,13 +533,14 @@ class PEMTaskCompiler
          $jsGrader = 
             'var grader = {'."\n"
            .'   gradeTask: function(answer, answerToken, callback) {'."\n"
-           .'      var taskParams = platform.getTaskParams();'."\n"
-           ."      if ($.inArray(answer+'', ".$this->getAcceptedAnswersJavascript().") > -1) {\n"
-           .'         score = taskParams.maxScore;'."\n"
-           .'      } else {'."\n"
-           .'         score = taskParams.minScore;'."\n"
-           .'      }'."\n"
-           ."      callback(score, '');\n"
+           .'      platform.getTaskParams(function(taskParams) {'."\n"
+           ."         if ($.inArray(answer+'', ".$this->getAcceptedAnswersJavascript().") > -1) {\n"
+           .'            score = taskParams.maxScore;'."\n"
+           .'         } else {'."\n"
+           .'            score = taskParams.minScore;'."\n"
+           .'         }'."\n"
+           ."         callback(score, '');\n"
+           ."      });\n"
            .'   }'."\n"
            .'}'."\n";
       }
