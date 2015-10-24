@@ -330,15 +330,17 @@ class PEMTaskCompiler
       $js = '[';
       
       $isFirst = true;
-      foreach ((array) $this->bebras->acceptedAnswers as $curAcceptedAnswer) {
-         if ($isFirst) {
-            $isFirst = false;
-         }
-         else {
-            $js .= ', ';
-         }
-         
-         $js .= "'".$curAcceptedAnswer."'";
+      if (property_exists($this->bebras, 'acceptedAnswers')) {
+        foreach ((array) $this->bebras->acceptedAnswers as $curAcceptedAnswer) {
+           if ($isFirst) {
+              $isFirst = false;
+           }
+           else {
+              $js .= ', ';
+           }
+           
+           $js .= "'".$curAcceptedAnswer."'";
+        }
       }
       
       $js .= ']';
