@@ -533,16 +533,18 @@ class PEMTaskCompiler
       }
       if ( ! $jsGrader) {
          $jsGrader = 
-            'var grader = {'."\n"
-           .'   gradeTask: function(answer, answerToken, callback) {'."\n"
-           .'      platform.getTaskParams(function(taskParams) {'."\n"
-           ."         if ($.inArray(answer+'', ".$this->getAcceptedAnswersJavascript().") > -1) {\n"
-           .'            score = taskParams.maxScore;'."\n"
-           .'         } else {'."\n"
-           .'            score = taskParams.minScore;'."\n"
-           .'         }'."\n"
-           ."         callback(score, '');\n"
-           ."      });\n"
+            'if (typeof grader === "undefined" && typeof task.gradeAnswer === "undefined") {'
+           .'   window.grader = {'."\n"
+           .'      gradeTask: function(answer, answerToken, callback) {'."\n"
+           .'         platform.getTaskParams(function(taskParams) {'."\n"
+           ."            if ($.inArray(answer+'', ".$this->getAcceptedAnswersJavascript().") > -1) {\n"
+           .'               score = taskParams.maxScore;'."\n"
+           .'            } else {'."\n"
+           .'               score = taskParams.minScore;'."\n"
+           .'            }'."\n"
+           ."            callback(score, '');\n"
+           ."         });\n"
+           .'      }'."\n"
            .'   }'."\n"
            .'}'."\n";
       }
