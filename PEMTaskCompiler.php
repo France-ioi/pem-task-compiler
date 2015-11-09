@@ -445,7 +445,30 @@ class PEMTaskCompiler
       }
       return $images;
    }
-   
+
+   /**
+    * Copies one image
+    * 
+    * @param int $mode Bitmask with self::CONTENT and self::SOLUTION
+    * @param string $copyFuncName is an optional parameter. If present, it must
+    *        be the name of a function with the same signature as the "copy"
+    *        function, which will be called instead of it.
+    *
+    * @return array of the images path in the form "$taskKey/imagefile"
+    */
+   public function copyImage($src, $dstDir, $copyFuncName = null) {
+      if ($src[0] == '/') {
+         $src = substr($src, 1);
+      }
+      $dstFile = $dstDir.'/'.$src;
+      if ($copyFuncName) {
+         call_user_func($copyFuncName, $this->taskDir.'/'.$src, $dstFile);
+      } else {
+         copy($this->taskDir.'/'.$src, $dstFile);
+      }
+      return $src;
+   }
+
    /**
     * Copies task content or solution images into $dstDir/$taskKey
     * 
@@ -460,16 +483,7 @@ class PEMTaskCompiler
       $images = array();
       $srcImages = $this->getImages($mode);
       foreach ($srcImages as $curImage) {
-         if ($curImage[0] == '/') {
-            $curImage = substr($curImage, 1);
-         }
-         $dstFile = $dstDir.'/'.$curImage;
-         if ($copyFuncName) {
-            call_user_func($copyFuncName, $this->taskDir.'/'.$curImage, $dstFile);
-         } else {
-            copy($this->taskDir.'/'.$curImage, $dstFile);
-         }
-         $images[] = $curImage;
+         $images[] = $this->copyImage($curImage, $dstDir, $copyFuncName);
       }
       
       return $images;
@@ -536,7 +550,7 @@ class PEMTaskCompiler
             'if (typeof grader === "undefined" && typeof task.gradeAnswer === "undefined") {'
            .'   window.grader = {'."\n"
            .'      gradeTask: function(answer, answerToken, callback) {'."\n"
-           .'         platform.getTaskParams(function(taskParams) {'."\n"
+           .'         platform.getTaskParams(null, null, function(taskParams) {'."\n"
            ."            if ($.inArray(answer+'', ".$this->getAcceptedAnswersJavascript().") > -1) {\n"
            .'               score = taskParams.maxScore;'."\n"
            .'            } else {'."\n"
@@ -546,6 +560,8 @@ class PEMTaskCompiler
            ."         });\n"
            .'      }'."\n"
            .'   }'."\n"
+           .'} else if (typeof grader !== "undefined") {'."\n"
+           .'   grader.acceptedAnswers = '.$this->getAcceptedAnswersJavascript().';'."\n"
            .'}'."\n";
       }
       return $jsGrader;
