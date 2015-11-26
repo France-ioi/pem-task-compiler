@@ -428,7 +428,7 @@ class PEMTaskCompiler
       foreach ($extensions as $extension) {
          $curPos = 0;
          while (($startImg = strpos($html, $extension, $curPos)) !== false) {
-            $endImg = $startImg + 3;
+            $endImg = $startImg + strlen($extension);
             $delimiter = $html[$endImg];
             if (($delimiter === '\'') || ($delimiter === '"')) {
                while (($startImg > 0) && ($html[$startImg - 1] != $delimiter)) {
