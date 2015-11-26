@@ -395,7 +395,7 @@ class PEMTaskCompiler
     * @return converted text
     */
    public static function moveQuestionImagesSrc($absolutePath, $text) {
-      $images = self::findUsedFiles($text, array('png', 'jpg', 'gif', 'PNG', 'JPG', 'GIF'), true);
+      $images = self::findUsedFiles($text, array('png', 'jpg', 'gif', 'eot', 'woff', 'ttf', 'EOT', 'WOFF', 'TTF', 'PNG', 'JPG', 'GIF'), true);
       foreach ($images as $image) {
          //$text = str_replace($image, "questions/".$questionData->folder."/".$questionData->key."/".$image, $text);
          $text = str_replace($image, $absolutePath.'/'.$image, $text);
