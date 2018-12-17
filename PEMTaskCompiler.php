@@ -608,7 +608,7 @@ class PEMTaskCompiler
       $questionBody = $this->getContent(self::TASK);
       
       // Remove absolute images
-      $questionBody = preg_replace('#http\://.*\.(png|jpg|gif|jpeg)#isU', '', $questionBody);
+      $questionBody = preg_replace('#http\://.*\.(png|jpg|gif|jpeg|mp4)#isU', '', $questionBody);
       $strQuestion = '<div id="question-'.$this->taskKey.'" class="question"><div id="task" class="taskView">'."\n"
               .'<style>'.$cssQuestions.'</style>'
               .self::moveQuestionImagesSrc($absolutePath, $questionBody)
