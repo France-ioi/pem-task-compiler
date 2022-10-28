@@ -231,6 +231,9 @@ class PEMTaskCompiler
       $resources = $this->getResourcesByMode($mode);
       foreach ($resources as $curResource) {
          if ($curResource->type == 'image') {
+            if(isset($curResource->classes) && in_array('convert-base64', $curResource->classes)) {
+               continue;
+            }
             $images[] = $curResource->url;
          }
       }
@@ -390,12 +393,43 @@ class PEMTaskCompiler
       return substr(strrchr($this->taskDir, '/'), 1);
    }
    
+   public function convertImagesBase64() {
+      $images = array();
+      
+      $resources = $this->getResourcesByMode(PEMTaskCompiler::TASK | PEMTaskCompiler::SOLUTION);
+      foreach ($resources as $curResource) {
+         if ($curResource->type == 'image') {
+            if(!isset($curResource->classes) || !in_array('convert-base64', $curResource->classes)) {
+               continue;
+            }
+            $src = $curResource->url;
+            if ($src[0] == '/') {
+               $src = substr($src, 1);
+            }
+            $src = $this->taskDir.'/'.$src;
+            $data = file_get_contents($src);
+            $type = mime_content_type($src);
+            $curResource->base64 = 'data:' . $type . ';base64,' . base64_encode($data);
+         }
+      }
+   }
+
    /**
     * Converts image relative path to absolute path
     * 
     * @return converted text
     */
-   public static function moveQuestionImagesSrc($absolutePath, $text) {
+   public function moveQuestionImagesSrc($absolutePath, $text) {
+      // First convert to base64 images which are tagged as such
+      $resources = $this->getResourcesByMode(PEMTaskCompiler::TASK | PEMTaskCompiler::SOLUTION);
+      foreach ($resources as $curResource) {
+         if(isset($curResource->base64)) {
+            $text = str_replace("\"" . $curResource->url, "\"" .$curResource->base64, $text);
+            $text = str_replace("'" . $curResource->url, "'" . $curResource->base64, $text);
+         }
+      }
+
+      // Then change the path of other images
       $images = self::findUsedFiles($text, array('png', 'jpg', 'gif', 'eot', 'woff', 'ttf', 'mp4', 'mp3', 'EOT', 'WOFF', 'TTF', 'PNG', 'JPG', 'GIF', 'MP4', 'MP3'), true);
       foreach ($images as $image) {
          //$text = str_replace($image, "questions/".$questionData->folder."/".$questionData->key."/".$image, $text);
