@@ -430,7 +430,7 @@ class PEMTaskCompiler
       }
 
       // Then change the path of other images
-      $images = self::findUsedFiles($text, array('png', 'jpg', 'gif', 'eot', 'woff', 'ttf', 'mp4', 'mp3', 'svg', 'EOT', 'WOFF', 'TTF', 'PNG', 'JPG', 'GIF', 'MP4', 'MP3', 'SVG'), true);
+      $images = self::findUsedFiles($text, array('png', 'jpg', 'gif', 'eot', 'woff', 'ttf', 'mp4', 'mp3', '.svg', 'EOT', 'WOFF', 'TTF', 'PNG', 'JPG', 'GIF', 'MP4', 'MP3', '.SVG'), true);
       foreach ($images as $image) {
          //$text = str_replace($image, "questions/".$questionData->folder."/".$questionData->key."/".$image, $text);
          $text = str_replace("\"".$image, "\"".$absolutePath.'/'.$image, $text);
