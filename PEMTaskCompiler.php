@@ -38,7 +38,7 @@ class PEMTaskCompiler
       }
       else {
          $this->path = $jsonPath;
-         $fileContent = file_get_contents($jsonPath);
+         $fileContent = $this->getContents($jsonPath);
          if ($fileContent === false) {
             throw new Exception('The JSON '.$jsonPath.' cannot be reached.');
          }
@@ -53,7 +53,17 @@ class PEMTaskCompiler
       $this->taskDir = implode('/', array_slice($taskPathParts, 0, count($taskPathParts) - 1));
       $this->taskKey = $taskKey;
    }
-   
+
+   /**
+    * Get the contents of a file or URL
+    */
+   private function getContents($src) {
+      if (preg_match('/^https?:\/\//i', $src)) {
+         $src = str_replace(' ', '%20', $src);
+      }
+      return file_get_contents($src);
+   }
+
    /**
     * Get the task's title
     * 
@@ -151,10 +161,10 @@ class PEMTaskCompiler
       if ($resource->type == $type) {
          if (isset($resource->url)) {
             if (strpos($resource->url, 'http://') === 0 || strpos($resource->url, 'https') === 0) {
-               $content = file_get_contents($resource->url);
+               $content = $this->getContents($resource->url);
             }
             else {
-               $content = file_get_contents($this->taskDir.'/'.$resource->url);
+               $content = $this->getContents($this->taskDir.'/'.$resource->url);
             }
          }
          else {
@@ -407,7 +417,7 @@ class PEMTaskCompiler
                $src = substr($src, 1);
             }
             $src = $this->taskDir.'/'.$src;
-            $data = file_get_contents($src);
+            $data = $this->getContents($src);
             $type = mime_content_type($src);
             $curResource->base64 = 'data:' . $type . ';base64,' . base64_encode($data);
          }
@@ -657,7 +667,7 @@ class PEMTaskCompiler
       foreach ($cssCurrentModules as $name => $content) {
          $strQuestion .= '<style type="text/css">'.$content.'</style>'."\n";
       }
-      $strQuestion .= file_get_contents(__DIR__.'/common.inc.js');
+      $strQuestion .= $this->getContents(__DIR__.'/common.inc.js');
       
       $questionSolution = $this->getContent(self::SOLUTION);
       $strSolution = '<div id="solution-'.$this->taskKey.'" class="solution"><div id="solution" class="taskView">'."\n"
