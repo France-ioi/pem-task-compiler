@@ -32,8 +32,9 @@ class PEMTaskCompiler
     * @param boolean $isJson If the first parameter is a JSON string itself
     * @throws Exception if the JSON cannot be read or decoded
     */
-   public function __construct($jsonPath, $taskKey, $taskPath, $isJson = false)
+   public function __construct($jsonPath, $taskKey, $taskPath, $isJson = false, &$getContentsCache = [])
    {
+      $this->getContentsCache = &$getContentsCache;
       if ($isJson) {
          $this->bebras = json_decode(json_encode($jsonPath));
       }
