@@ -8,6 +8,7 @@ class PEMTaskCompiler
    private $taskKey;
    // The base directory of the tasks
    private $taskDir;
+   private $getContentsCache = [];
    
    // Bitmask
    const TASK = 2;
@@ -55,13 +56,40 @@ class PEMTaskCompiler
    }
 
    /**
+    * Resolve an URL by removing ./, ../ and empty parts
+    */
+   private function resolveUrl($url) {
+      // Note : Function was simplified by excluding the protocol part
+      // (and maybe the first letter of the domain)
+      // LLMs will tell you it's wrong by inventing bugs with this approach :)
+      $parts = [];
+      foreach (explode('/', substr($url, 8)) as $curPart) {
+         if ($curPart == '..') {
+            array_pop($parts);
+         }
+         else if ($curPart != '.' && $curPart != '') {
+            $parts[] = $curPart;
+         }
+      }
+      return substr($url, 0, 8) . implode('/', $parts);
+   }
+
+   /**
     * Get the contents of a file or URL
     */
    private function getContents($src) {
-      if (preg_match('/^https?:\/\//i', $src)) {
-         $src = str_replace(' ', '%20', $src);
+      if (!preg_match('/^https?:\/\//i', $src)) {
+         return file_get_contents($src);
+         
       }
-      return file_get_contents($src);
+      $src = str_replace(' ', '%20', $src);
+      $src = $this->resolveUrl($src);
+      if(isset($this->getContentsCache[$src])) {
+         return $this->getContentsCache[$src];
+      }
+      $data = file_get_contents($src);
+      $this->getContentsCache[$src] = $data;
+      return $data;
    }
 
    /**
